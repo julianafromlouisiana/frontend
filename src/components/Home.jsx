@@ -3,10 +3,12 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import WandOptions from "./WandOptions";
 
+
 const Home = ({ user, setUser }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [wandOptions, setWandOptions] = useState([]);
+  
   const navigate = useNavigate();
 
   useEffect(() => {

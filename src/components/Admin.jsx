@@ -79,13 +79,13 @@ const Admin = () => {
   useEffect(() => {
     const filtered = submittedCustomers.filter((customer) => {
       const matchHouse = !searchCriteria.house || customer.house === searchCriteria.house;
-      const matchWizardId = !searchCriteria.wizardId || customer.id.includes(searchCriteria.wizardId);
+      const matchWizardId = !searchCriteria.wizardId || customer.id == searchCriteria.wizardId;
       const matchName = !searchCriteria.name ||
         customer.name.toLowerCase().includes(searchCriteria.name.toLowerCase());
 
       return matchHouse && matchWizardId && matchName;
     });
-
+    console.log("FILTERED", filtered);
     setFilteredCustomers(filtered);
     
   }, [searchCriteria, submittedCustomers]);
@@ -104,12 +104,14 @@ const Admin = () => {
     const newCustomer = {
       name: `${firstName} ${lastName}`,
       house: selectedHouse,
+      core: selectedWand.split("/")[1].split("-")[1],
+    wood: selectedWand.split("/")[0].split("-")[1],
     };
   
     try {
      
       const createWizardResponse = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/wand-options/create-wizard`, newCustomer, { 
-        hearders: { 
+        headers: { 
           "Content-Type": "application/json"
         }
       })
@@ -122,8 +124,8 @@ const Admin = () => {
         //   wood: selectedWand.split("/")[0].split("-")[1], // Get wood from selectedWand
         //   house: selectedHouse,
         // });
-  
-        const wizardDetails = await fetchWizardDetails(createWizardResponse.id);
+        console.log("Wizard Details", createWizardResponse);
+        const wizardDetails = await fetchWizardDetails(createWizardResponse.data.id);
   
         //Update the local state to include the new customer along with existing customers
         setSubmittedCustomers((prevCustomers) => [
@@ -144,11 +146,12 @@ const Admin = () => {
     }
   };
   
-  
+  // /wizards/:id/wand
   const handleRemoveWand = async (wizardId) => {
     try {
       // Send a request to the backend to remove the wand
-      await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/wizards/${wizardId}`);
+      await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/wand-options/wizards/${wizardId}/wand`);
+      console.log(`Wizard with ID ${wizardId} removed successfully.`);
       //Update Local State to remove a wand
       const updatedSubmittedCustomers = submittedCustomers.filter(
         (customer) => customer.id !== wizardId
@@ -176,18 +179,24 @@ const Admin = () => {
   };
   
   const handleSearch = async () => {
+    console.log(searchCriteria);
+    
+    
     try{
       const response = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}/api/wizards/search`,
-        {
-          params: searchCriteria,
-        }
+        `${process.env.REACT_APP_BACKEND_URL}/api/wizards/${searchCriteria.wizardId}`
+        // {
+        //   params: searchCriteria,
+        // }
       );
-      setFilteredCustomers(response.data);
+      console.log(response.data);
+      setFilteredCustomers([response.data]);
     } catch (error) {
       console.log("Error searching wizards", error);
     }
   };
+  
+    console.log(filteredCustomers);
 
   return (
     <div>

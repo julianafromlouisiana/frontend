@@ -34,7 +34,7 @@ const App = () => {
           
       
         {/* <Redirect from="/" to="/home" /> */}
-        <Route path="*" element={<Home />} />
+        <Route path="*" element={<Home user={user} setUser={setUser} />} />
       </Routes>
     </Router>
   );
